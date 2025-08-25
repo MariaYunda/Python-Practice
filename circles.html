@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Capacity Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-circle-progress/1.2.2/circle-progress.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0d2346 0%, #3c6f9e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #eee;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            color: #7f8c8d;
+            font-size: 1.5em;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #3498db;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .circle-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+
+        .info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .info p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .percentage {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #2c3e50;
+        }
+
+        .breadcrumb {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        .breadcrumb span {
+            color: #3498db;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SCHOOL CAPACITY DASHBOARD</h1>
+            <h2 id="currentView">CITY: NEW YORK</h2>
+        </div>
+
+        <button class="back-btn" id="backBtn" style="display: none;">
+            < BACK
+        </button>
+
+        <div class="breadcrumb" id="breadcrumb">
+            Current location: <span>City Overview</span>
+        </div>
+
+        <div class="grid" id="contentGrid">
+        </div>
+    </div>
+
+    <script>
+        const cityData = {
+            cityName: "NEW YORK",
+            regions: [
+                {
+                    regionName: "THE BRONX",
+                    allPlaces: 9000,
+                    filledPlaces: 4500,
+                    schools: [
+                        {
+                            schoolName: "SCHOOL № 1",
+                            allPlaces: 900,
+                            filledPlaces: 450,
+                            classes: [
+                                { className: "FIRST GRADES", allPlaces: 225, filledPlaces: 140 },
+                                { className: "SECOND GRADES", allPlaces: 225, filledPlaces: 130 },
+                                { className: "THIRD GRADES", allPlaces: 225, filledPlaces: 100 },
+                                { className: "FOURTH GRADES", allPlaces: 225, filledPlaces: 80 }
+                            ]
+                        },
+                        {
+                            schoolName: "SCHOOL № 2",
+                            allPlaces: 900,
+                            filledPlaces: 540,
+                            classes: [
+                                { className: "FIRST GRADES", allPlaces: 225, filledPlaces: 150 },
+                                { className: "SECOND GRADES", allPlaces: 225, filledPlaces: 160 },
+                                { className: "THIRD GRADES", allPlaces: 225, filledPlaces: 130 },
+                                { className: "FOURTH GRADES", allPlaces: 225, filledPlaces: 100 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    regionName: "QUEENS",
+                    allPlaces: 7500,
+                    filledPlaces: 3000,
+                    schools: [
+                        {
+                            schoolName: "SCHOOL № 3",
+                            allPlaces: 750,
+                            filledPlaces: 300,
+                            classes: [
+                                { className: "FIRST GRADES", allPlaces: 188, filledPlaces: 80 },
+                                { className: "SECOND GRADES", allPlaces: 188, filledPlaces: 90 },
+                                { className: "THIRD GRADES", allPlaces: 187, filledPlaces: 70 },
+                                { className: "FOURTH GRADES", allPlaces: 187, filledPlaces: 60 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    regionName: "BROOKLYN",
+                    allPlaces: 9375,
+                    filledPlaces: 7500,
+                    schools: [
+                        {
+                            schoolName: "SCHOOL № 4",
+                            allPlaces: 937,
+                            filledPlaces: 750,
+                            classes: [
+                                { className: "FIRST GRADES", allPlaces: 234, filledPlaces: 200 },
+                                { className: "SECOND GRADES", allPlaces: 234, filledPlaces: 210 },
+                                { className: "THIRD GRADES", allPlaces: 234, filledPlaces: 190 },
+                                { className: "FOURTH GRADES", allPlaces: 235, filledPlaces: 150 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    regionName: "STATEN ISLAND",
+                    allPlaces: 8833,
+                    filledPlaces: 5300,
+                    schools: [
+                        {
+                            schoolName: "SCHOOL № 5",
+                            allPlaces: 883,
+                            filledPlaces: 530,
+                            classes: [
+                                { className: "FIRST GRADES", allPlaces: 221, filledPlaces: 150 },
+                                { className: "SECOND GRADES", allPlaces: 221, filledPlaces: 160 },
+                                { className: "THIRD GRADES", allPlaces: 221, filledPlaces: 120 },
+                                { className: "FOURTH GRADES", allPlaces: 220, filledPlaces: 100 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    regionName: "MANHATTAN",
+                    allPlaces: 10000,
+                    filledPlaces: 9000,
+                    schools: [
+                        {
+                            schoolName: "SCHOOL № 6",
+                            allPlaces: 1000,
+                            filledPlaces: 900,
+                            classes: [
+                                { className: "FIRST GRADES", allPlaces: 250, filledPlaces: 225 },
+                                { className: "SECOND GRADES", allPlaces: 250, filledPlaces: 230 },
+                                { className: "THIRD GRADES", allPlaces: 250, filledPlaces: 220 },
+                                { className: "FOURTH GRADES", allPlaces: 250, filledPlaces: 225 }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let currentView = 'city';
+        let currentRegion = null;
+        let currentSchool = null;
+        let breadcrumb = ['City Overview'];
+
+        function getColorForPercentage(percentage) {
+            if (percentage <= 20) return '#8fbc8f'; 
+            if (percentage <= 40) return '#008b8b'; 
+            if (percentage <= 60) return '#e9967a';
+            if (percentage <= 80) return '#ff8c00';
+            return '#8b0000';
+        }
+
+        function createCircleChart(container, percentage, size = 150) {
+            const color = getColorForPercentage(percentage);
+            
+            $(container).circleProgress({
+                value: percentage / 100,
+                size: size,
+                fill: { color: color },
+                emptyFill: 'rgba(0, 0, 0, 0.1)',
+                thickness: 8,
+                startAngle: -Math.PI / 2,
+                animation: { duration: 1500, easing: 'circleProgressEasing' }
+            });
+        }
+
+        function showRegions() {
+            currentView = 'city';
+            currentRegion = null;
+            currentSchool = null;
+            breadcrumb = ['City Overview'];
+            updateBreadcrumb();
+            
+            $('#currentView').text(`CITY: ${cityData.cityName}`);
+            $('#backBtn').hide();
+            
+            const grid = $('#contentGrid');
+            grid.empty();
+            
+            cityData.regions.forEach(region => {
+                const percentage = Math.round((region.filledPlaces / region.allPlaces) * 100);
+                const card = `
+                    <div class="card" data-region="${region.regionName}">
+                        <h3>${region.regionName}</h3>
+                        <div class="circle-container" id="chart-${region.regionName.replace(/\s+/g, '-')}"></div>
+                        <div class="info">
+                            <p>places filled: <strong>${region.filledPlaces}</strong></p>
+                            <p>out of places available: <strong>${region.allPlaces}</strong></p>
+                            <p class="percentage">${percentage}% filled</p>
+                        </div>
+                    </div>
+                `;
+                grid.append(card);
+                
+                setTimeout(() => {
+                    createCircleChart(`#chart-${region.regionName.replace(/\s+/g, '-')}`, percentage);
+                }, 100);
+            });
+        }
+
+        function showSchools(regionName) {
+            const region = cityData.regions.find(r => r.regionName === regionName);
+            if (!region) return;
+            
+            currentView = 'region';
+            currentRegion = regionName;
+            currentSchool = null;
+            breadcrumb = ['City Overview', regionName];
+            updateBreadcrumb();
+            
+            $('#currentView').text(`CITY: ${cityData.cityName} -> REGION: ${regionName}`);
+            $('#backBtn').show();
+            
+            const grid = $('#contentGrid');
+            grid.empty();
+            
+            region.schools.forEach(school => {
+                const percentage = Math.round((school.filledPlaces / school.allPlaces) * 100);
+                const card = `
+                    <div class="card" data-school="${school.schoolName}">
+                        <h3>${school.schoolName}</h3>
+                        <div class="circle-container" id="chart-${school.schoolName.replace(/\s+/g, '-')}"></div>
+                        <div class="info">
+                            <p>places filled: <strong>${school.filledPlaces}</strong></p>
+                            <p>out of places available: <strong>${school.allPlaces}</strong></p>
+                            <p class="percentage">${percentage}% filled</p>
+                        </div>
+                    </div>
+                `;
+                grid.append(card);
+                
+                setTimeout(() => {
+                    createCircleChart(`#chart-${school.schoolName.replace(/\s+/g, '-')}`, percentage, 120);
+                }, 100);
+            });
+        }
+
+        function showClasses(regionName, schoolName) {
+            const region = cityData.regions.find(r => r.regionName === regionName);
+            if (!region) return;
+            
+            const school = region.schools.find(s => s.schoolName === schoolName);
+            if (!school) return;
+            
+            currentView = 'school';
+            currentRegion = regionName;
+            currentSchool = schoolName;
+            breadcrumb = ['City Overview', regionName, schoolName];
+            updateBreadcrumb();
+            
+            $('#currentView').text(`CITY: ${cityData.cityName} -> REGION: ${regionName} -> ${schoolName}`);
+            $('#backBtn').show();
+            
+            const grid = $('#contentGrid');
+            grid.empty();
+            
+            school.classes.forEach(cls => {
+                const percentage = Math.round((cls.filledPlaces / cls.allPlaces) * 100);
+                const card = `
+                    <div class="card">
+                        <h3>${cls.className}</h3>
+                        <div class="circle-container" id="chart-${cls.className.replace(/\s+/g, '-')}"></div>
+                        <div class="info">
+                            <p>places filled: <strong>${cls.filledPlaces}</strong></p>
+                            <p>out of places available: <strong>${cls.allPlaces}</strong></p>
+                            <p class="percentage">${percentage}% filled</p>
+                        </div>
+                    </div>
+                `;
+                grid.append(card);
+                
+                setTimeout(() => {
+                    createCircleChart(`#chart-${cls.className.replace(/\s+/g, '-')}`, percentage, 100);
+                }, 100);
+            });
+        }
+
+        function updateBreadcrumb() {
+            $('#breadcrumb').html(`Current location: <span>${breadcrumb.join(' → ')}</span>`);
+        }
+
+        $(document).ready(function() {
+            showRegions();
+
+            $('#backBtn').click(function() {
+                if (currentView === 'school') {
+                    showSchools(currentRegion);
+                } else if (currentView === 'region') {
+                    showRegions();
+                }
+            });
+
+            $(document).on('click', '.card[data-region]', function() {
+                const regionName = $(this).data('region');
+                showSchools(regionName);
+            });
+
+            $(document).on('click', '.card[data-school]', function() {
+                const schoolName = $(this).data('school');
+                showClasses(currentRegion, schoolName);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Формы с валидацией Parsley</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+             background: linear-gradient(180deg, #234757, #308395);
+        }
+        
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .form-container {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            background-color: white;
+        }
+        
+        label {
+            width: 100px;
+            margin-right: 10px;
+            text-align: right;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="file"],
+        input[type="date"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        
+        .error-container {
+            margin-left: 10px;
+            color: red;
+            min-height: 20px;
+            width: 250px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #124053;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 110px;
+        }
+        
+        button:hover {
+            background-color: #123c4e;
+        }
+        
+        .result-table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .result-table th, .result-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .result-table th {
+            background-color: #f2f2f2;
+        }
+        
+        .gender-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .strength-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+        
+        .strength-badge.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .very-easy {
+            background-color: #ff4d4d;
+            color: white;
+        }
+        
+        .easy {
+            background-color: #ff9933;
+            color: white;
+        }
+        
+        .normal {
+            background-color: #33cc33;
+            color: white;
+        }
+        
+        .hard {
+            background-color: #0066cc;
+            color: white;
+        }
+        
+        .password-feedback {
+            margin-left: 110px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+            .password-strength {
+            margin-left: 10px;
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- the First form -->
+    <div class="form-container">
+        <h2>Register form</h2>
+        <form id="registerForm" data-parsley-validate>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required
+                       data-parsley-required-message="Username is required"
+                       data-parsley-minlength="4" data-parsley-minlength-message="Min length is 4 characters"
+                       data-parsley-maxlength="20" data-parsley-maxlength-message="Max length is 20 characters"
+                       data-parsley-forbidden-values>
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required
+                       data-parsley-required-message="Email is required"
+                       data-parsley-type-message="Enter a valid email address">
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required
+                       data-parsley-required-message="Password is required"
+                       data-parsley-minlength="6" data-parsley-minlength-message="Min length is 6 characters"
+                       data-parsley-maxlength="30" data-parsley-maxlength-message="Max length is 30 characters">
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label></label>
+                <div class="password-strength">
+                    <span class="strength-badge very-easy">Very easy</span>
+                    <span class="strength-badge easy">Easy</span>
+                    <span class="strength-badge normal">Normal</span>
+                    <span class="strength-badge hard">Hard</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="repeatPassword">Repeat:</label>
+                <input type="password" id="repeatPassword" name="repeatPassword" required
+                       data-parsley-required-message="Repeat is required"
+                       data-parsley-equalto="#password" data-parsley-equalto-message="The passwords must match">
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit">Register</button>
+            </div>
+        </form>
+        
+        <div id="registerResult"></div>
+    </div>
+    
+    <!-- The second forn -->
+    <div class="form-container">
+        <h2>User info</h2>
+        <form id="userInfoForm" data-parsley-validate>
+            <div class="form-group">
+                <label for="fullName">Full name:</label>
+                <input type="text" id="fullName" name="fullName" required
+                       data-parsley-required-message="Full name is required"
+                       data-parsley-minlength="2" data-parsley-minlength-message="Min length is 2 characters"
+                       data-parsley-maxlength="50" data-parsley-maxlength-message="Max length is 50 characters"
+                       data-parsley-pattern="^[a-zA-Zа-яА-Я\s\-]+$" data-parsley-pattern-message="Full name may only contain letters, spaces, and dashes">
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="avatar">Avatar:</label>
+                <input type="file" id="avatar" name="avatar" required
+                       data-parsley-required-message="Avatar is required">
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="birthday">Birthday:</label>
+                <input type="date" id="birthday" name="birthday" required
+                       data-parsley-required-message="Birthday is required"
+                       data-parsley-min="1900-01-01" data-parsley-min-message="Min birthday is 01/01/1900">
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Gender:</label>
+                <div class="gender-group">
+                    <label><input type="radio" name="gender" value="male" required data-parsley-required-message="Gender is required"> Male</label>
+                    <label><input type="radio" name="gender" value="female"> Female</label>
+                </div>
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="subscribe">Subscribe:</label>
+                <input type="checkbox" id="subscribe" name="subscribe">
+                <div class="error-container"></div>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit">Save</button>
+            </div>
+        </form>
+        
+        <div id="userInfoResult"></div>
+    </div>
+
+    <script>
+        window.Parsley.addValidator('forbiddenValues', {
+            validateString: function(value) {
+                const forbidden = ['admin', 'user', 'test'];
+                return !forbidden.includes(value.toLowerCase());
+            },
+            messages: {
+                en: "Username 'admin' or 'user' or 'test' is not allowed"
+            }
+        });
+
+        function getPasswordStrength(password) {
+            if (!password) return {level: 'none', name: 'No password'};
+            
+            const hasDigits = /[0-9]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasUpper = /[A-Z]/.test(password);
+            const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+            
+            if (hasDigits && hasLower && hasUpper && hasSpecial) {
+                return {level: 'hard', name: 'Hard'};
+            }
+            if (hasDigits && hasLower && hasUpper) {
+                return {level: 'normal', name: 'Normal'};
+            }
+            if ((hasDigits && hasLower) || (hasDigits && hasUpper)) {
+                return {level: 'easy', name: 'Easy'};
+            }
+            return {level: 'very-easy', name: 'Very easy'};
+        }
+
+        function updatePasswordStrengthBadges(password) {
+            const strength = getPasswordStrength(password);
+            const badges = $('.strength-badge');
+            
+            badges.removeClass('active');
+            
+            if (strength.level !== 'none') {
+                $(`.strength-badge.${strength.level}`).addClass('active');
+            }
+
+            let feedback = '';
+            if (password.length > 0) {
+                feedback = `Current strength: ${strength.name}`;
+                if (password.length < 6) {
+                    feedback += ' (too short)';
+                }
+            }
+            $('.password-feedback').remove();
+            if (password.length > 0) {
+                $('#password').after(`<div class="password-feedback">${feedback}</div>`);
+            }
+        }
+
+        $('#registerForm').parsley().on('form:submit', function() {
+            const username = $('#username').val();
+            const email = $('#email').val();
+            const password = $('#password').val();
+            const strength = getPasswordStrength(password);
+            
+            const resultHTML = `
+                <h3>Result</h3>
+                <table class="result-table">
+                    <tr><th>Username</th><td>${username}</td></tr>
+                    <tr><th>Email</th><td>${email}</td></tr>
+                    <tr><th>Password</th><td>${'*'.repeat(password.length)} (${strength.name.toLowerCase()})</td></tr>
+                </table>
+            `;
+            
+            $('#registerResult').html(resultHTML);
+            return false; 
+        });
+
+        $('#userInfoForm').parsley().on('form:submit', function() {
+            const fullName = $('#fullName').val();
+            const avatar = $('#avatar').val().split('\\').pop(); 
+            const birthday = $('#birthday').val();
+            const gender = $('input[name="gender"]:checked').val();
+            const subscribe = $('#subscribe').is(':checked') ? 'Yes' : 'No';
+            
+            const resultHTML = `
+                <h3>Result</h3>
+                <table class="result-table">
+                    <tr><th>Full Name</th><td>${fullName}</td></tr>
+                    <tr><th>Avatar</th><td>${avatar}</td></tr>
+                    <tr><th>Birthday</th><td>${birthday}</td></tr>
+                    <tr><th>Gender</th><td>${gender}</td></tr>
+                    <tr><th>Subscribe</th><td>${subscribe}</td></tr>
+                </table>
+            `;
+            
+            $('#userInfoResult').html(resultHTML);
+            return false; 
+        });
+
+        $('#password').on('input', function() {
+            updatePasswordStrengthBadges($(this).val());
+        });
+
+    
+
+
+
+        $(document).ready(function() {
+            $('form').parsley().on('field:error', function(fieldInstance) {
+                const fieldName = fieldInstance.$element.attr('name');
+                const errorMessage = fieldInstance.getErrorsMessages()[0];
+                $(`[name="${fieldName}"]`).siblings('.error-container').text(errorMessage);
+            });
+
+            $('form').parsley().on('field:success', function(fieldInstance) {
+                const fieldName = fieldInstance.$element.attr('name');
+                $(`[name="${fieldName}"]`).siblings('.error-container').text('');
+            });
+
+            $('input').blur(function() {
+                $(this).parsley().validate();
+            });
+            
+            updatePasswordStrengthBadges('');
+        });
+    </script>
+</body>
+</html>
